@@ -2,6 +2,9 @@ import subprocess
 from http.server import ThreadingHTTPServer
 from webserver.portal_handler import PortalHandler
 from concurrent.futures import ThreadPoolExecutor
+import atexit
+import signal
+import sys
 import os
 from dotenv import load_dotenv
 
@@ -32,10 +35,28 @@ def scan_networks():
         print(f"Error scanning networks: {e}")
         raise Exception(f"Error scanning networks: {e}")
 
+def create_hotspot():
+    try:
+        subprocess.run(['sudo', 'nmcli', 'dev', 'wifi', 'hotspot', 'ifname', 'wlan0', 'ssid', 'BrEye-Setup', 'password', 'setup-1234'])
+        print("Hotspot created successfully")
+    except Exception as e:
+        print(f"Error creating hotspot: {e}")
+        raise Exception(f"Error creating hotspot: {e}")
+
+def remove_hotspot():
+    try:
+        subprocess.run(['sudo', 'nmcli', 'dev', 'wifi', 'hotspot', 'ifname', 'wlan0', 'remove'])
+        print("Hotspot removed successfully")
+    except Exception as e:
+        print(f"Error removing hotspot: {e}")
+        raise Exception(f"Error removing hotspot: {e}")
+
 
 
 def __main__():
     load_dotenv()
+    atexit.register(remove_hotspot)
+    signal.signal(signal.SIGTERM, lambda sig, frame: sys.exit(0))
     dummy_wifi = os.getenv("DUMMY_WIFI")
     if dummy_wifi:
         dummy_wifi = dummy_wifi.lower() == "true"
@@ -64,10 +85,11 @@ def __main__():
         print(network)
     
     try:
-        subprocess.run(['sudo', 'nmcli', 'dev', 'wifi', 'hotspot', 'ifname', 'wlan0', 'ssid', 'BrEye-Setup', 'password', 'setup-1234'])
-        print("Hotspot created successfully")
+        create_hotspot()
     except Exception as e:
         print(f"Error creating hotspot: {e}")
+        remove_hotspot()
+        return
 
 
     try:
@@ -87,6 +109,7 @@ def __main__():
         except Exception as e:
             print(f"Error connecting to the WiFi: {e}")
 
+    remove_hotspot()
 
 
 if __name__ == "__main__":
