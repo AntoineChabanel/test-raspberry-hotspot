@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs
+import mimetypes
+import os
 import html
 
 class SsidAndPassword:
@@ -33,6 +35,18 @@ class PortalHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(page.encode("utf-8"))
+        else:
+            file_path = self.path.lstrip("/")
+            if os.path.isfile(file_path):
+                mime_type, _ = mimetypes.guess_type(file_path)
+                self.send_response(200)
+                self.send_header("Content-type", mime_type or "application/octet-stream")
+                self.end_headers()
+                with open(file_path, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_response(404)
+                self.end_headers()
 
     def do_POST(self):
         if self.path == "/submit":
