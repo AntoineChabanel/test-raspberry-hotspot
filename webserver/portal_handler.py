@@ -1,11 +1,9 @@
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse, urlencode
 import mimetypes
 import os
 import html
 
-# Chemins utilisés par les OS pour détecter un portail captif.
-# Si on reçoit une requête pour l'un d'eux, on redirige vers notre page (comme en aéroport).
 CAPTIVE_PORTAL_DETECTION_PATHS = {
     "/hotspot-detect.html",           # Apple (iOS / macOS)
     "/library/test/success.html",     # Apple (ancien)
@@ -13,7 +11,7 @@ CAPTIVE_PORTAL_DETECTION_PATHS = {
     "/connecttest.txt",               # Windows
     "/redirect",                      # Windows
     "/ncsi.txt",                      # Windows
-    "/success.txt",                   # Divers
+    "/success.txt",                   # Diverse
 }
 
 class SsidAndPassword:
@@ -32,7 +30,6 @@ class PortalHandler(BaseHTTPRequestHandler):
     ssid_and_password = SsidAndPassword()
 
     def do_GET(self):
-        # Portail captif : rediriger les requêtes de détection vers notre page d'accueil
         parsed = urlparse(self.path)
         path_only = parsed.path.rstrip("/") or "/"
         if path_only != "/" and path_only in CAPTIVE_PORTAL_DETECTION_PATHS:
@@ -44,7 +41,6 @@ class PortalHandler(BaseHTTPRequestHandler):
             with open("index.html", "r", encoding="utf-8") as f:
                 page = f.read()
 
-            # IMPORTANT: echapper les SSID (securite)
             safe_ssids = [html.escape(s) for s in self.available_ssids]
 
             options_html = build_ssid_options(safe_ssids)
@@ -78,6 +74,7 @@ class PortalHandler(BaseHTTPRequestHandler):
             print(f"SSID: {ssid}, Password: {password}")
             self.ssid_and_password.ssid = ssid
             self.ssid_and_password.password = password
+            success_msg = "Data has been sent. The device will attempt to connect to the network you provided."
             self.send_response(302)
-            self.send_header("Location", "/")
+            self.send_header("Location", "/?" + urlencode({"msg": success_msg}))
             self.end_headers()
