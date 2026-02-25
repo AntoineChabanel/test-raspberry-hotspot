@@ -1,8 +1,20 @@
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 import mimetypes
 import os
 import html
+
+# Chemins utilisés par les OS pour détecter un portail captif.
+# Si on reçoit une requête pour l'un d'eux, on redirige vers notre page (comme en aéroport).
+CAPTIVE_PORTAL_DETECTION_PATHS = {
+    "/hotspot-detect.html",           # Apple (iOS / macOS)
+    "/library/test/success.html",     # Apple (ancien)
+    "/generate_204",                  # Android / Chrome
+    "/connecttest.txt",               # Windows
+    "/redirect",                      # Windows
+    "/ncsi.txt",                      # Windows
+    "/success.txt",                   # Divers
+}
 
 class SsidAndPassword:
     ssid = None
@@ -20,7 +32,15 @@ class PortalHandler(BaseHTTPRequestHandler):
     ssid_and_password = SsidAndPassword()
 
     def do_GET(self):
-        if self.path == "/":
+        # Portail captif : rediriger les requêtes de détection vers notre page d'accueil
+        parsed = urlparse(self.path)
+        path_only = parsed.path.rstrip("/") or "/"
+        if path_only != "/" and path_only in CAPTIVE_PORTAL_DETECTION_PATHS:
+            self.send_response(302)
+            self.send_header("Location", "/")
+            self.end_headers()
+            return
+        if self.path == "/" or path_only == "/":
             with open("index.html", "r", encoding="utf-8") as f:
                 page = f.read()
 
@@ -36,7 +56,7 @@ class PortalHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(page.encode("utf-8"))
         else:
-            file_path = self.path.lstrip("/")
+            file_path = parsed.path.lstrip("/")
             if os.path.isfile(file_path):
                 mime_type, _ = mimetypes.guess_type(file_path)
                 self.send_response(200)
