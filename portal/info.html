@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BrEye - Information</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --primary: #2f6df6;
+      --primary-soft: rgba(47,109,246,.1);
+      --text: #1f2933;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 28px 22px 22px 22px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.08);
+      border: 1px solid var(--border);
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 16px;
+      transition: color .15s;
+    }
+
+    .back:hover { color: var(--primary); }
+
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .info-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .info-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+
+    .info-list li:last-child { border-bottom: none; }
+
+    .info-label {
+      font-size: 13px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 500;
+      text-align: right;
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .lang-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lang-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-family: system-ui, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <a href="/" class="back">&larr; Back</a>
+
+    <h1>Additional Information</h1>
+
+    <ul class="info-list">
+      <li>
+        <span class="info-label">MAC Address</span>
+        <span class="info-value">E4:5F:01:D8:F9:66</span>
+      </li>
+      <li>
+        <span class="info-label">Commit</span>
+        <span class="info-value">8fb54d918923c59af1ae38e691c35715a86b1556</span>
+      </li>
+      <li>
+        <span class="info-label">Languages</span>
+        <span class="info-value">
+          <span class="lang-tags">
+            <span class="lang-tag">FR</span>
+            <span class="lang-tag">EN</span>
+            <span class="lang-tag">ES</span>
+            <span class="lang-tag">IT</span>
+          </span>
+        </span>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
